@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,90 +9,87 @@ using NARAOURCEISG.Models;
 
 namespace NARAOURCEISG.Controllers
 {
-    public class RoleController : Controller
+    public class RolesController : Controller
     {
-        private readonly NARAOUCREISGDBContext _context;
+        private readonly NARAOURCEISGDBContext _context;
 
-        public RoleController(NARAOUCREISGDBContext context)
+        public RolesController(NARAOURCEISGDBContext context)
         {
             _context = context;
         }
 
-        // GET: Role
+        // GET: Roles
         public async Task<IActionResult> Index()
         {
-            var nARAOUCREISGDBContext = _context.User.Include(u => u.Role);
-            return View(await nARAOUCREISGDBContext.ToListAsync());
+              return _context.Roles != null ? 
+                          View(await _context.Roles.ToListAsync()) :
+                          Problem("Entity set 'NARAOURCEISGDBContext.Roles'  is null.");
         }
 
-        // GET: Role/Details/5
+        // GET: Roles/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.User == null)
+            if (id == null || _context.Roles == null)
             {
                 return NotFound();
             }
 
-            var user = await _context.User
-                .Include(u => u.Role)
+            var role = await _context.Roles
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
+            if (role == null)
             {
                 return NotFound();
             }
 
-            return View(user);
+            return View(role);
         }
 
-        // GET: Role/Create
+        // GET: Roles/Create
         public IActionResult Create()
         {
-            ViewData["RoleId"] = new SelectList(_context.Set<Role>(), "Id", "Id");
             return View();
         }
 
-        // POST: Role/Create
+        // POST: Roles/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UserName,Password,Email,Status,Image,RoleId")] User user)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description")] Role role)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(user);
+                _context.Add(role);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoleId"] = new SelectList(_context.Set<Role>(), "Id", "Id", user.RoleId);
-            return View(user);
+            return View(role);
         }
 
-        // GET: Role/Edit/5
+        // GET: Roles/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.User == null)
+            if (id == null || _context.Roles == null)
             {
                 return NotFound();
             }
 
-            var user = await _context.User.FindAsync(id);
-            if (user == null)
+            var role = await _context.Roles.FindAsync(id);
+            if (role == null)
             {
                 return NotFound();
             }
-            ViewData["RoleId"] = new SelectList(_context.Set<Role>(), "Id", "Id", user.RoleId);
-            return View(user);
+            return View(role);
         }
 
-        // POST: Role/Edit/5
+        // POST: Roles/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserName,Password,Email,Status,Image,RoleId")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Role role)
         {
-            if (id != user.Id)
+            if (id != role.Id)
             {
                 return NotFound();
             }
@@ -101,12 +98,12 @@ namespace NARAOURCEISG.Controllers
             {
                 try
                 {
-                    _context.Update(user);
+                    _context.Update(role);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(user.Id))
+                    if (!RoleExists(role.Id))
                     {
                         return NotFound();
                     }
@@ -117,51 +114,49 @@ namespace NARAOURCEISG.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoleId"] = new SelectList(_context.Set<Role>(), "Id", "Id", user.RoleId);
-            return View(user);
+            return View(role);
         }
 
-        // GET: Role/Delete/5
+        // GET: Roles/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.User == null)
+            if (id == null || _context.Roles == null)
             {
                 return NotFound();
             }
 
-            var user = await _context.User
-                .Include(u => u.Role)
+            var role = await _context.Roles
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
+            if (role == null)
             {
                 return NotFound();
             }
 
-            return View(user);
+            return View(role);
         }
 
-        // POST: Role/Delete/5
+        // POST: Roles/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.User == null)
+            if (_context.Roles == null)
             {
-                return Problem("Entity set 'NARAOUCREISGDBContext.User'  is null.");
+                return Problem("Entity set 'NARAOURCEISGDBContext.Roles'  is null.");
             }
-            var user = await _context.User.FindAsync(id);
-            if (user != null)
+            var role = await _context.Roles.FindAsync(id);
+            if (role != null)
             {
-                _context.User.Remove(user);
+                _context.Roles.Remove(role);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool UserExists(int id)
+        private bool RoleExists(int id)
         {
-          return (_context.User?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Roles?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
