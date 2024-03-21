@@ -8,8 +8,9 @@ namespace NARAOURCEISG.Models
     public partial class User
     {
         public int Id { get; set; }
-        [Required]
+        [Required] 
         public string UserName { get; set; } = null!;
+
 
         [DataType(DataType.Password)]
         public string Password { get; set; } = null!;

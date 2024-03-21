@@ -1,0 +1,108 @@
+﻿@model NARAOURCEISG.Models.User
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+
+<!-- MODIFICANDO -->
+<div class="row" style="margin-top:20px;">
+    <div class="row">
+        <form asp-action="Create" class="card" enctype="multipart/form-data">
+            <div class="card-header row">
+                <h1 class="card-text col-md-12">Registrar Empleado</h1>
+            </div>
+            <div class="card-body row">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="col-md-4">
+                    <img id="imagenPrevia" src="~/img/default.jpg" alt="Vista previa de la imagen" style="max-width: 200px; max-height: 200px;">
+                </div>
+                <div class="form-group col-md-4">
+                    <label asp-for="Image" class="control-label"></label>
+                    <input type="file" asp-for="Image" class="form-control" id="fileImagen" onchange="mostrarVistaPrevia()" accept="image/*" />
+                    <span asp-validation-for="Image" class="text-danger"></span>
+
+                    <!-- ESTO MUESTRA EL ERROR PARA IMAGEN-->
+                    @if (TempData["MensajeError"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["MensajeError"]</div>
+                    }
+
+                </div>
+                <div class="form-group col-md-4">
+                    <label asp-for="RoleId" class="control-label">Rol <span style="color:red;">*</span></label>
+                    <select asp-for="RoleId" class="form-select" asp-items="ViewBag.RoleId"></select>
+                </div>
+                <div class="form-group col-md-6">
+                    <label asp-for="UserName" class="control-label">Nombre <span style="color:red;">*</span></label>
+                    <input asp-for="UserName" class="form-control" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-3">
+                    <label class="control-label">Estado <span style="color:red;">*</span></label>
+                    <select asp-for="Status" class="form-control">
+                        <option selected value="1">Activo</option>
+                        <option  value="2">Inactivo</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-8">
+                    <label asp-for="Email" class="control-label">Correo Electrónico <span style="color:red;">*</span></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-4">
+                    <label asp-for="Password" class="control-label">Contraseña <span style="color:red;">*</span></label>
+                    <input asp-for="Password" class="form-control"/>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <divc class="row">
+                    <div class="form-group col-md-6" style="margin-top:10px;">
+                        <input type="submit" value="Crear" class="btn btn-primary" style="width:100%;" />
+                    </div>
+                    <div class="form-group col-md-6" style="margin-top:10px;">
+                        <a asp-action="Index" class="btn btn-secondary" style="width:100%;">Cancelar</a>
+                    </div>
+
+                </divc>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        function mostrarVistaPrevia() {
+            var input = document.getElementById('fileImagen');
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    document.getElementById('imagenPrevia').src = e.target.result;
+                }
+
+                reader.readAsDataURL(input.files[0]); // Convierte el archivo a una URL base64
+            }
+        }
+
+        function togglePasswordVisibility() {
+            var inputPassword = document.getElementById("inputPassword");
+            var eyeIconClosed = document.getElementById("eyeIconClosed");
+            var eyeIconOpen = document.getElementById("eyeIconOpen");
+
+            if (inputPassword.type === "password") {
+                inputPassword.type = "text";
+                eyeIconClosed.style.display = "none";
+                eyeIconOpen.style.display = "inline";
+            } else {
+                inputPassword.type = "password";
+                eyeIconClosed.style.display = "inline";
+                eyeIconOpen.style.display = "none";
+            }
+        }
+
+
+    </script>
+}
