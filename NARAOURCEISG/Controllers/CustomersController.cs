@@ -21,9 +21,9 @@ namespace NARAOURCEISG.Controllers
         // GET: Customers
         public async Task<IActionResult> Index()
         {
-              return _context.Customers != null ? 
-                          View(await _context.Customers.ToListAsync()) :
-                          Problem("Entity set 'NARAOURCEISGDBContext.Customers'  is null.");
+            return _context.Customers != null ?
+                        View(await _context.Customers.ToListAsync()) :
+                        Problem("Entity set 'NARAOURCEISGDBContext.Customers'  is null.");
         }
 
         // GET: Customers/Details/5
@@ -35,19 +35,33 @@ namespace NARAOURCEISG.Controllers
             }
 
             var customer = await _context.Customers
+                .Include(s => s.Contacts)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (customer == null)
             {
                 return NotFound();
             }
-
+            ViewBag.Accion = "Details";
             return View(customer);
         }
 
         // GET: Customers/Create
         public IActionResult Create()
         {
-            return View();
+            var customer = new Customer();
+            customer.Contacts = new List<Contact>();
+            customer.Contacts.Add(new Contact
+            {
+                FirstName = "",
+                LastName = "",
+                Email = "",
+                Phone = "",
+                ContactType = ""
+
+            });
+            ViewBag.Accion = "Create";
+            return View(customer);
+
         }
 
         // POST: Customers/Create
@@ -55,15 +69,44 @@ namespace NARAOURCEISG.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,Email,Phone")] Customer customer)
+        public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,Email,Phone,Contacts")] Customer customer)
         {
-            if (ModelState.IsValid)
+
+            _context.Add(customer);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+
+        }
+
+        [HttpPost]
+        public ActionResult AgregarDetalles([Bind("Id,FirstName,LastName,Email,Phone,Contacts")] Customer customer, string accion)
+        {
+            customer.Contacts.Add(new Contact
             {
-                _context.Add(customer);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                FirstName = " ",
+                LastName = "",
+                Email = "",
+                Phone = "",
+                ContactType = ""
+            });
+            ViewBag.Accion = accion;
+            return View(accion, customer);
+        }
+        public ActionResult EliminarDetalles([Bind("Id,FirstName,LastName,Email,Phone,Contacts")] Customer customer,
+           int index, string accion)
+        {
+            var det = customer.Contacts[index];
+            if (accion == "Edit" && det.Id > 0)
+            {
+                det.Id = det.Id * -1;
             }
-            return View(customer);
+            else
+            {
+                customer.Contacts.RemoveAt(index);
+            }
+
+            ViewBag.Accion = accion;
+            return View(accion, customer);
         }
 
         // GET: Customers/Edit/5
@@ -74,47 +117,93 @@ namespace NARAOURCEISG.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customers.FindAsync(id);
+            var customer = await _context.Customers
+                .Include(s => s.Contacts).FirstAsync(s => s.Id == id);
             if (customer == null)
             {
                 return NotFound();
             }
+            ViewBag.Accion = "Edit";
             return View(customer);
         }
+
+
 
         // POST: Customers/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,Email,Phone")] Customer customer)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,Email,Phone,Contacts")] Customer customer)
         {
             if (id != customer.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+
+            try
             {
-                try
+                var customerUpdate = await _context.Customers
+                       .Include(s => s.Contacts)
+                       .FirstAsync(s => s.Id == customer.Id);
+                customerUpdate.FirstName = customer.FirstName;
+                customerUpdate.LastName = customer.FirstName;
+                customerUpdate.Email = customer.Email;
+                customerUpdate.Phone = customer.Phone;
+                customerUpdate.Phone = customer.Phone;
+
+
+                // Obtener todos los detalles que seran nuevos y agregarlos a la base de datos
+                var detNew = customer.Contacts.Where(s => s.Id == 0);
+                foreach (var d in detNew)
                 {
-                    _context.Update(customer);
-                    await _context.SaveChangesAsync();
+                    customerUpdate.Contacts.Add(d);
                 }
-                catch (DbUpdateConcurrencyException)
+                // Obtener todos los detalles que seran modificados y actualizar a la base de datos
+                var detUpdate = customer.Contacts.Where(s => s.Id > 0);
+                foreach (var d in detUpdate)
                 {
-                    if (!CustomerExists(customer.Id))
+                    var det = customerUpdate.Contacts.FirstOrDefault(s => s.Id == d.Id);
+                    det.FirstName = d.FirstName;
+                    det.FirstName = d.FirstName;
+                    det.Email = d.Email;
+                    det.Phone = d.Phone;
+                    det.ContactType = d.ContactType;
+
+
+
+                }
+                // Obtener todos los detalles que seran eliminados y actualizar a la base de datos
+                var delDetIds = customer.Contacts.Where(s => s.Id < 0).Select(s => -s.Id).ToList();
+                if (delDetIds != null && delDetIds.Count > 0)
+                {
+                    foreach (var detalleId in delDetIds) // Cambiado de 'id' a 'detalleId'
                     {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
+                        var det = await _context.Contacts.FindAsync(detalleId); // Cambiado de 'id' a 'detalleId'
+                        if (det != null)
+                        {
+                            _context.Contacts.Remove(det);
+                        }
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                _context.Update(customerUpdate);
+                await _context.SaveChangesAsync();
             }
-            return View(customer);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!CustomerExists(customer.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
+
+
         }
 
         // GET: Customers/Delete/5
@@ -126,12 +215,14 @@ namespace NARAOURCEISG.Controllers
             }
 
             var customer = await _context.Customers
+                .Include(s=> s.Contacts)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (customer == null)
             {
                 return NotFound();
             }
 
+            ViewBag.Accion = "Delete";
             return View(customer);
         }
 
@@ -149,14 +240,14 @@ namespace NARAOURCEISG.Controllers
             {
                 _context.Customers.Remove(customer);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool CustomerExists(int id)
         {
-          return (_context.Customers?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Customers?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
