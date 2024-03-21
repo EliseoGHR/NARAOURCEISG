@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace NARAOURCEISG.Models
 {
@@ -11,9 +12,18 @@ namespace NARAOURCEISG.Models
         }
 
         public int Id { get; set; }
+
+        [Required]
         public string FirstName { get; set; } = null!;
+
+        [Required]
         public string LastName { get; set; } = null!;
+
+        [Required]
+        [DataType (DataType.EmailAddress)]
         public string? Email { get; set; }
+        
+        [Required]
         public string? Phone { get; set; }
 
         public virtual ICollection<Contact> Contacts { get; set; }
