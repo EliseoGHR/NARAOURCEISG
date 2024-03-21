@@ -8,7 +8,7 @@ namespace NARAOURCEISG.Models
     {
         public Customer()
         {
-            Contacts = new HashSet<Contact>();
+            Contacts = new List<Contact>();
         }
 
         public int Id { get; set; }
@@ -26,6 +26,6 @@ namespace NARAOURCEISG.Models
         [Required]
         public string? Phone { get; set; }
 
-        public virtual ICollection<Contact> Contacts { get; set; }
+        public virtual IList<Contact> Contacts { get; set; }
     }
 }
