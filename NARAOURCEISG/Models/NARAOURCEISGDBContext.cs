@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace NARAOURCEISG.Models
 {
-    public partial class NARAOUCREISGDBContext : DbContext
+    public partial class NARAOURCEISGDBContext : DbContext
     {
-        public NARAOUCREISGDBContext()
+        public NARAOURCEISGDBContext()
         {
         }
 
-        public NARAOUCREISGDBContext(DbContextOptions<NARAOUCREISGDBContext> options)
+        public NARAOURCEISGDBContext(DbContextOptions<NARAOURCEISGDBContext> options)
             : base(options)
         {
         }
@@ -26,7 +26,7 @@ namespace NARAOURCEISG.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("workstation id=NARAOUCREISGDB.mssql.somee.com;packet size=4096;user id=Test_Proyect_SQLLogin_1;pwd=hocx3lmgh7;data source=NARAOUCREISGDB.mssql.somee.com;persist security info=False;initial catalog=NARAOUCREISGDB;TrustServerCertificate=True");
+                optionsBuilder.UseSqlServer("workstation id=NARAOURCEISGDB.mssql.somee.com;packet size=4096;user id=Chello_eisg_SQLLogin_1;pwd=gbl2lupvxh;data source=NARAOURCEISGDB.mssql.somee.com;persist security info=False;initial catalog=NARAOURCEISGDB;TrustServerCertificate=True");
             }
         }
 
@@ -57,7 +57,6 @@ namespace NARAOURCEISG.Models
                 entity.HasOne(d => d.Customer)
                     .WithMany(p => p.Contacts)
                     .HasForeignKey(d => d.CustomerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Contacts__Custom__4316F928");
             });
 
