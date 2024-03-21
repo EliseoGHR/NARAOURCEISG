@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using NARAOURCEISG.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<NARAOUCREISGDBContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("NARAOUCREISGDBContext") ?? throw new InvalidOperationException("Connection string 'NARAOUCREISGDBContext' not found.")));
 
 // Add services to the container
 builder.Services.AddControllersWithViews();
