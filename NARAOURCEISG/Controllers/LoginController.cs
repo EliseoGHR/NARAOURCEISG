@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
@@ -24,66 +27,62 @@ namespace NARAOURCEISG.Controllers
             configuration = configuration1;
         }
 
-        public IActionResult Login()
+
+         [AllowAnonymous]
+        public async Task<IActionResult> Login(string ReturnUrl)
         {
-            ClaimsPrincipal c = HttpContext.User;
-            if (c.Identity != null)
-            {
-                if (c.Identity.IsAuthenticated)
-                    return RedirectToAction("Index", "Perfiles");
-            }
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            ViewBag.ReturnUrl = ReturnUrl;
             return View();
         }
-
+        [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> Login(User u)
+        public async Task<IActionResult> Login([Bind("Email,Password")] User usuario, string ReturnUrl)
         {
-            
-            try
+            usuario.Password = CalcularHashMD5(usuario.Password);
+            var usuarioAut = await _context.Users.FirstOrDefaultAsync(s => s.Email == usuario.Email && s.Password == usuario.Password && s.Status == 1);
+            if (usuarioAut?.Id > 0 && usuarioAut.Email == usuario.Email)
             {
-                using (SqlConnection con = new(configuration.GetConnectionString("conn")))
-                {
+                var claims = new[] {
+                    new Claim(ClaimTypes.Name, usuarioAut.Email),
                     
-                    using (SqlCommand cmd = new("sp_login", con))
-                    {
-                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        cmd.Parameters.Add("@Email", System.Data.SqlDbType.VarChar).Value = u.Email;
-                        cmd.Parameters.Add("@Password", System.Data.SqlDbType.VarChar).Value = u.Password;
-                        con.Open();
-                        var dr = cmd.ExecuteReader();
-                        
-                        while (dr.Read())
-                        {
-                            
-                            if (dr["Email"] != null && u.Email != null)
-                            {
-                                List<Claim> c = new List<Claim>()
-                                {
-                                    new Claim(ClaimTypes.NameIdentifier, u.Email)
-                                };
-                                ClaimsIdentity ci = new(c, CookieAuthenticationDefaults.AuthenticationScheme);
-                                AuthenticationProperties p = new();
+                    new Claim("Id", usuarioAut.Id.ToString())
+                    };
 
-                                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(ci), p);
-                                return RedirectToAction("Index", "Customers");
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-                            }
-                            else
-                            {
-                                ViewBag.Error = "Credenciales incorrectas o cuenta no registrada.";
-                            }
-                        }
-                        con.Close();
-                    }
-                    return View();
-                }
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), new AuthenticationProperties { IsPersistent = true }); ;
+                var result = User.Identity.IsAuthenticated;
+                if (!string.IsNullOrWhiteSpace(ReturnUrl))
+                    return Redirect(ReturnUrl);
+                else
+                    return RedirectToAction("Index", "Home");
             }
-            catch (System.Exception e)
-            {
-                ViewBag.Error = e.Message;
-                return View();
-            }
+            else
+               ViewBag.Error ="Credenciales incorrectas";
+            ViewBag.pReturnUrl = ReturnUrl;
+            return View(usuario);
         }
-    
+
+         private string CalcularHashMD5(string texto)
+        {
+            using (MD5 md5 = MD5.Create())
+            {
+                // Convierte la cadena de texto a bytes
+                byte[] inputBytes = Encoding.UTF8.GetBytes(texto);
+
+                // Calcula el hash MD5 de los bytes
+                byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                // Convierte el hash a una cadena hexadecimal
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < hashBytes.Length; i++)
+                {
+                    sb.Append(hashBytes[i].ToString("x2"));
+                }
+
+                return sb.ToString();
+            }
+         }
     }
 }
