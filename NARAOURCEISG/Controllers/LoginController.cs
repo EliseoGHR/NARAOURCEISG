@@ -84,5 +84,66 @@ namespace NARAOURCEISG.Controllers
                 return sb.ToString();
             }
          }
+
+        //  [Authorize]
+        public async Task<IActionResult> ChangePassword()
+        {
+                Console.Write("mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm" + User.FindFirstValue("Id"));
+
+            int id = int.Parse(User.FindFirstValue("Id"));
+
+           
+            var usuario = await _context.Users.FindAsync(id);
+            if (usuario == null)
+            {
+                return NotFound();
+            }
+            
+            return View(usuario);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        // [Authorize]
+        public async Task<IActionResult> ChangePassword([Bind("Id,Password")] User usuario, string passwordAnt)
+        {
+            try
+            {
+                var passwordAntData = CalcularHashMD5(passwordAnt);
+                var usuarioData = await _context.Users.FirstOrDefaultAsync(s => s.Id == usuario.Id && s.Password == passwordAntData);
+               if(usuarioData!=null && usuarioData.Id > 0)
+                {
+                    usuarioData.Password = CalcularHashMD5(usuario.Password);
+                    _context.Update(usuarioData);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Login", "Login");
+                }
+               else
+                {
+                    ViewBag.Error = "El password anterior es incorrecto";
+                    int id = int.Parse(User.FindFirstValue("Id"));
+                    var usuarioReturn = await _context.Users.FindAsync(id);
+                    return View(usuarioReturn);
+                }
+                   
+
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UsuarioExists(usuario.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+         private bool UsuarioExists(int id)
+        {
+          return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
     }
 }
