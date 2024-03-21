@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NARAOURCEISG.Models;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<NARAOUCREISGDBContext>(options =>
@@ -11,6 +12,13 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<NARAOURCEISGDBContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("conn")));
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(option =>
+{
+    option.LoginPath = "/Customers/Index";
+});
+
+builder.Services.AddSession();
 
 var app = builder.Build();
 
@@ -24,9 +32,10 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
+app.UseSession();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
