@@ -12,18 +12,18 @@
             </div>
             <div class="table-responsive col-md-12">
                 <div class="card-body row">
-                   
+
                     <div class="row">
                         <div class="form-group col-md-4">
-                            <label class="control-label">CustomerID</label>
-                            <input type="text" class="form-control" name="CustomerId" />
+                            <label class="control-label">Nombre</label>
+                            <input type="text" class="form-control" name="fisrtName" />
                         </div>
                         <div class="form-group  col-md-4">
-                            <label class="control-label">CustomerID</label>
-                            <input type="text" class="form-control" name="CustomerId" />
+                            <label class="control-label">Apellido</label>
+                            <input type="text" class="form-control" name="lastName" />
                         </div>
 
-                        
+
                         <div class="form-group col-md-4">
                             <label class="control-label">Tipo</label>
                             <select class="form-control" name="Opcion">
@@ -36,7 +36,7 @@
                         <div class="form-group col-md-12">
                             <input style="width:100%; margin-top:10px;" type="submit" value="Generar Reporte" class="btn btn-warning" />
                         </div>
-                       
+
                     </div>
 
                 </div>
@@ -44,8 +44,24 @@
         </form>
     </div>
 </div>
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var modelState in ViewData.ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            }
+        </ul>
+    </div>
+}
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
 }

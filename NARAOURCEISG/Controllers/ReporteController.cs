@@ -15,6 +15,7 @@ namespace NARAOURCEISG.Controllers
 
 
         private readonly NARAOURCEISGDBContext _context;
+
         public ReporteController(NARAOURCEISGDBContext context)
         {
             _context = context;
@@ -23,20 +24,37 @@ namespace NARAOURCEISG.Controllers
         public IActionResult Index()
         {
 
-
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> GenerarReporte(int CustomerId, string opcion)
+        public async Task<IActionResult> GenerarReporte(string opcion, string fisrtName, string lastName)
         {
+            if (string.IsNullOrEmpty(fisrtName) || string.IsNullOrEmpty(lastName))
+            {
+                ModelState.AddModelError(string.Empty, "Por favor, ingrese tanto el nombre como el apellido.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                // Si hay errores de validación, devolver la vista con los errores
+                return View("Index");
+            }
+
+            var compras = await _context.Customers
+               .Include(s => s.Contacts)
+
+               .Where(s => s.FirstName == fisrtName && s.LastName == lastName)
+
+               .ToListAsync();
 
 
-            var customers = await _context.Customers.Where(c => c.Id == CustomerId).ToListAsync();
+
+
 
             if (opcion == "PDF")
             {
-                return new ViewAsPdf("GenerarReporte", customers)
+                return new ViewAsPdf("GenerarReporte", compras)
                 {
                     // ...
                 };
@@ -61,7 +79,7 @@ namespace NARAOURCEISG.Controllers
 
                     int fila = 1; // Iniciar desde la fila 1
 
-                    foreach (var compra in customers)
+                    foreach (var compra in compras)
                     {
                         // Insertar encabezados antes de cada compra
                         worksheet.Cells[fila, 1].Value = "Nombre";
@@ -91,12 +109,6 @@ namespace NARAOURCEISG.Controllers
 
                         fila++; // Incrementar la fila para dejar espacio entre los datos de la compra y los detalles
 
-
-
-                        // Escribir los detalles de compra
-
-                        // Aumentar la fila adicional para dejar espacio entre las compras
-
                     }
                     var range = worksheet.Cells["A1:D" + fila];
 
@@ -106,11 +118,11 @@ namespace NARAOURCEISG.Controllers
                     byte[] fileContents = package.GetAsByteArray();
 
 
+                    // Devolvemos el archivo Excel como una descarga
 
-                    return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ReporteClientes.xlsx");
+                    return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ReporteCompras.xlsx");
                 }
             }
-
             else
             {
                 return Content("Opcion no valida");
