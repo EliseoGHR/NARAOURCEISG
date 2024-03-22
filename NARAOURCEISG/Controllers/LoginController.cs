@@ -16,6 +16,7 @@ using NARAOURCEISG.Models;
 
 namespace NARAOURCEISG.Controllers
 {
+       [AllowAnonymous]
     [Authorize]
     public class LoginController : Controller
     {
