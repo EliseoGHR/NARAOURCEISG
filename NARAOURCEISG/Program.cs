@@ -4,8 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<NARAOUCREISGDBContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("NARAOUCREISGDBContext") ?? throw new InvalidOperationException("Connection string 'NARAOUCREISGDBContext' not found.")));
 
 // Add services to the container
 builder.Services.AddControllersWithViews();
