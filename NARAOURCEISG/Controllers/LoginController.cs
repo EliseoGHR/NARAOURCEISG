@@ -44,7 +44,7 @@ namespace NARAOURCEISG.Controllers
         public async Task<IActionResult> Login([Bind("Email,Password")] User usuario, string ReturnUrl)
         {
             usuario.Password = CalcularHashMD5(usuario.Password);
-            var usuarioAut = await _context.Users.FirstOrDefaultAsync(s => s.Email == usuario.Email && s.Password == usuario.Password && s.Status == 1);
+            var usuarioAut = await _context.Users.Include(e => e.Role).FirstOrDefaultAsync(s => s.Email == usuario.Email && s.Password == usuario.Password && s.Status == 1);
             if (usuarioAut?.Id > 0 && usuarioAut.Email == usuario.Email)
             {
                 var claims = new[] {
