@@ -13,10 +13,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<NARAOURCEISGDBContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("conn")));
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(option =>
-{
-    option.LoginPath = "/Customers/Index";
-});
+
 
 builder.Services.AddSession();
 
