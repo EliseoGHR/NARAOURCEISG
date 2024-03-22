@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace NARAOURCEISG.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Empleado, Gerente, Administrador")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

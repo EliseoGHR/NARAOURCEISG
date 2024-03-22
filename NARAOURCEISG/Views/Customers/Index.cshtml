@@ -14,12 +14,11 @@
 
 
         <div class="card-body row">
-            @if (User.IsInRole("Administrador"))
-            {
+           
                 <p class="col-md-12">
-                    <a class="btn btn-primary" style="width:100%;" asp-action="Create">Crear Cliente</a>
+                <a class="btn btn-success" style="width:100%;" asp-action="Create">Registrar Cliente</a>
                 </p>
-            }
+            
 
 
             <form asp-action="Index" method="GET">
@@ -93,11 +92,10 @@
                                 <td>
                                     <table>
                                         <td>
-                                            @if (User.IsInRole("Empleado"))
-                                            {
+                                           
                                                 <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.Id">Editar</a>
                                                 <span> | </span>
-                                            }
+                                            
                                         </td>
                                         <td>
                                             <a class="btn btn-secondary" asp-action="Details" asp-route-id="@item.Id">Detalle</a>

@@ -47,7 +47,7 @@ namespace NARAOURCEISG.Controllers
         }
 
         // GET: Customers/Details/5
-        [Authorize(Roles = "Empleado, Gerente, Administrador")]
+      
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Customers == null)
@@ -67,7 +67,7 @@ namespace NARAOURCEISG.Controllers
         }
 
         // GET: Customers/Create
-        [Authorize(Roles = "Empleado")]
+       
         public IActionResult Create()
         {
             var customer = new Customer();
@@ -91,7 +91,7 @@ namespace NARAOURCEISG.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Empleado")]
+       
         public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,Email,Phone,Contacts")] Customer customer)
         {
 
@@ -102,7 +102,7 @@ namespace NARAOURCEISG.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Empleado")]
+        
         public ActionResult AgregarDetalles([Bind("Id,FirstName,LastName,Email,Phone,Contacts")] Customer customer, string accion)
         {
             customer.Contacts.Add(new Contact
@@ -116,7 +116,7 @@ namespace NARAOURCEISG.Controllers
             ViewBag.Accion = accion;
             return View(accion, customer);
         }
-        [Authorize(Roles = "Empleado")]
+        
         public ActionResult EliminarDetalles([Bind("Id,FirstName,LastName,Email,Phone,Contacts")] Customer customer,
            int index, string accion)
         {
@@ -135,7 +135,7 @@ namespace NARAOURCEISG.Controllers
         }
 
         // GET: Customers/Edit/5
-        [Authorize(Roles = "Empleado")]
+       
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Customers == null)
@@ -160,7 +160,7 @@ namespace NARAOURCEISG.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Empleado")]
+      
         public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,Email,Phone,Contacts")] Customer customer)
         {
             if (id != customer.Id)
