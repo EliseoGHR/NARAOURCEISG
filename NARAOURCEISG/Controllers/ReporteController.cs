@@ -120,7 +120,7 @@ namespace NARAOURCEISG.Controllers
 
                     // Devolvemos el archivo Excel como una descarga
 
-                    return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ReporteCompras.xlsx");
+                    return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ReporteCliente.xlsx");
                 }
             }
             else
