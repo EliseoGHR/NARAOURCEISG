@@ -20,7 +20,7 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">HOME</a>
                         </li>
                         @if (User.Identity.IsAuthenticated)
                         {
@@ -34,7 +34,23 @@
 
                             }
 
-                            @if (User.IsInRole("Administrador, Empleado"))
+                            @if (User.IsInRole("Administrador") || User.IsInRole("Gerente"))
+                            {
+                                <!-- Ver Los Clientes-->
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Customers" asp-action="Index">CLIENTES</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Reporte" asp-action="Index">REPORTES</a>
+                                </li>
+                                <!-- Ver Los USUARIOS -->
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">USUARIOS</a>
+                                </li>
+                            }
+
+                            @if (User.IsInRole("Administrador") || User.IsInRole("Empleado"))
                             {            
                                 <!-- Ver Los USUARIOS -->
                                 <li class="nav-item">
@@ -42,21 +58,11 @@
                                 </li>
                                 <!-- Ver Los Clientes-->
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Customers" asp-action="Index">Customer</a>
-                                </li>
-
-                            }
-                            @if (User.IsInRole("Administrador,Gerente"))
-                            {
-                               <!-- Ver Los Clientes-->
-                                <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Customers" asp-action="Index">CLIENTES</a>
                                 </li>
 
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="ReporteCustomer" asp-action="Index">REPORTES</a>
-                                </li>
                             }
+                            
 
                         }
 

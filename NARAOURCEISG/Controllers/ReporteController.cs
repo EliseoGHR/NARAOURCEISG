@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace NARAOURCEISG.Controllers
 {
-    [Authorize(Roles ="Gerente,Administrador")]
+    [Authorize(Roles = "Gerente,Administrador")]
     public class ReporteController : Controller
     {
 

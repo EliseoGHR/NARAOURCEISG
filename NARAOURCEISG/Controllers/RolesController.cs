@@ -10,7 +10,7 @@ using NARAOURCEISG.Models;
 
 namespace NARAOURCEISG.Controllers
 {
-    [Authorize(Roles="Adiministrador")]
+    [Authorize(Roles="Administrador")]
     public class RolesController : Controller
     {
         private readonly NARAOURCEISGDBContext _context;
