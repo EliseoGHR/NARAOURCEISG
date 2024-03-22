@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -12,6 +13,7 @@ using NARAOURCEISG.Models;
 
 namespace NARAOURCEISG.Controllers
 {
+    [Authorize(Roles ="Administrador,Gerente")]
     public class UsersController : Controller
     {
         private readonly NARAOURCEISGDBContext _context;

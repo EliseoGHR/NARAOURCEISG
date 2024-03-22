@@ -16,6 +16,7 @@ using NARAOURCEISG.Models;
 
 namespace NARAOURCEISG.Controllers
 {
+    [Authorize]
     public class LoginController : Controller
     {
         private readonly NARAOURCEISGDBContext _context;
@@ -35,6 +36,8 @@ namespace NARAOURCEISG.Controllers
             ViewBag.ReturnUrl = ReturnUrl;
             return View();
         }
+
+
         [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Login([Bind("Email,Password")] User usuario, string ReturnUrl)
@@ -44,13 +47,12 @@ namespace NARAOURCEISG.Controllers
             if (usuarioAut?.Id > 0 && usuarioAut.Email == usuario.Email)
             {
                 var claims = new[] {
-                    new Claim(ClaimTypes.Name, usuarioAut.Email),
-                    
+                    new Claim(ClaimTypes.Name, usuarioAut.UserName),  
+                    new Claim(ClaimTypes.Role, usuarioAut.Role.Name),
                     new Claim("Id", usuarioAut.Id.ToString())
                     };
 
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), new AuthenticationProperties { IsPersistent = true }); ;
                 var result = User.Identity.IsAuthenticated;
                 if (!string.IsNullOrWhiteSpace(ReturnUrl))

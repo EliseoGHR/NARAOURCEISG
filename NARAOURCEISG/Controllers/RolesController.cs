@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using NARAOURCEISG.Models;
 
 namespace NARAOURCEISG.Controllers
 {
+    [Authorize(Roles="Adiministrador")]
     public class RolesController : Controller
     {
         private readonly NARAOURCEISGDBContext _context;
@@ -19,6 +21,7 @@ namespace NARAOURCEISG.Controllers
         }
 
         // GET: Roles
+
         public async Task<IActionResult> Index()
         {
               return _context.Roles != null ? 

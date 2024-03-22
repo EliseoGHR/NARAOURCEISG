@@ -5,9 +5,11 @@ using OfficeOpenXml.Style;
 using OfficeOpenXml;
 using Rotativa.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NARAOURCEISG.Controllers
 {
+    [Authorize(Roles ="Gerente,Administrador")]
     public class ReporteController : Controller
     {
 

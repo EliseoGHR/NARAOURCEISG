@@ -20,6 +20,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddSession();
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie((o) =>
+{
+    o.LoginPath = new PathString("/Login/login");
+    o.AccessDeniedPath = new PathString("/Login/login");
+    o.ExpireTimeSpan = TimeSpan.FromHours(8);
+    o.SlidingExpiration = true;
+    o.Cookie.HttpOnly = true;
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -37,6 +45,7 @@ app.UseStaticFiles();
 app.UseSession();
 app.UseRouting();
 
+// Para Login
 app.UseAuthentication();
 app.UseAuthorization();
 
