@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Security;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,12 +22,28 @@ namespace NARAOURCEISG.Controllers
         }
 
         // GET: Customers
-        [Authorize(Roles = "Empleado, Gerente, Administrador")]
-        public async Task<IActionResult> Index()
+        // [Authorize(Roles = "Empleado, Gerente, Administrador")]
+        public async Task<IActionResult> Index(Customer customer)
         {
-            return _context.Customers != null ?
-                        View(await _context.Customers.ToListAsync()) :
-                        Problem("Entity set 'NARAOURCEISGDBContext.Customers'  is null.");
+            var query = _context.Customers.AsQueryable();
+            if(string.IsNullOrWhiteSpace(customer.FirstName) == false)
+            {
+                query = query.Where(s=> s.FirstName.Contains(customer.FirstName));
+            }
+            if (string.IsNullOrWhiteSpace(customer.LastName) == false)
+            {
+                query = query.Where(s => s.LastName.Contains(customer.LastName));
+            }
+            if (string.IsNullOrWhiteSpace(customer.Phone) == false)
+            {
+                query = query.Where(s => s.Phone == customer.Phone);
+            }
+            if (customer.Take == 0)
+                customer.Take = 10;
+            query = query.Take(customer.Take);
+            return query != null ? 
+                          View(await query.ToListAsync()) :
+                          Problem("Entity set 'ApplicationDbContext.Usuarios'  is null.");
         }
 
         // GET: Customers/Details/5

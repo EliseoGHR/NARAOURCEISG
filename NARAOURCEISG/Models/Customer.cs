@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NARAOURCEISG.Models
 {
@@ -26,6 +27,10 @@ namespace NARAOURCEISG.Models
         [Required]
         public string? Phone { get; set; }
 
+         [NotMapped]
+        public int Take { get; set; }
+
         public virtual IList<Contact> Contacts { get; set; }
     }
 }
+
